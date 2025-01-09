@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ADMgmtSystem/database"
 	"ADMgmtSystem/library"
 	"ADMgmtSystem/routers"
 	"fmt"
@@ -18,6 +19,13 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	err = database.InitDatabase()
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	port := os.Getenv("HTTP_PORT")
 	domain := os.Getenv("HTTP_DOMAIN")
 	portocol := os.Getenv("HTTP_PORTOCOL")
