@@ -13,10 +13,19 @@ import (
 	"gorm.io/gorm"
 )
 
+var PgConn *gorm.DB
+
 func register() []interface{} {
 	return []interface{}{
 		&models.Users{},
 		&models.UsersMeta{},
+	}
+}
+func registerSeedData() []interface{} {
+	return []interface{}{
+		&models.Users{ID: "admin", Account: "admin", Password: "5a1d689fabfeefb613fbf4399f8795e9b54102bdc2ce85d13483dc3e2b97c003",
+			PasswordSalt: `()#"(#!%+%`, ErrorCount: 0, Activated: true, Role: 1},
+		&models.UsersMeta{UsersID: "admin", Name: "administrator", Email: "test@yahoo.com.tw", Avatar: nil, SendEmail: true},
 	}
 }
 
@@ -37,7 +46,7 @@ func InitDatabase() error {
 		log.Fatalf("Failed to ensure database exists: %v", err)
 	}
 
-	db, err := gorm.Open(postgres.Open(fmt.Sprintf("%s dbname=%s", conn, dbName)), &gorm.Config{})
+	PgConn, err := gorm.Open(postgres.Open(fmt.Sprintf("%s dbname=%s", conn, dbName)), &gorm.Config{})
 
 	if err != nil {
 		return fmt.Errorf("faild to connect to database: %v", err)
@@ -45,10 +54,18 @@ func InitDatabase() error {
 
 	allModels := register()
 
-	err = db.AutoMigrate(allModels...)
-
+	err = PgConn.AutoMigrate(allModels...)
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %v", err)
+	}
+
+	seedDatas := registerSeedData()
+
+	for _, seedData := range seedDatas {
+		if err := PgConn.FirstOrCreate(seedData, seedData).Error; err != nil {
+			fmt.Println(err)
+			return err
+		}
 	}
 
 	return nil

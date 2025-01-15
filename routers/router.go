@@ -17,7 +17,7 @@ type Route struct {
 var routes []Route
 
 func init() {
-	register("GET", "/api/SayHello", controllers.SayHello, nil)
+	register("GET", "/api/login", controllers.Login, nil)
 }
 
 // NewRouter
