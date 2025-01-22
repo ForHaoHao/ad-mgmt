@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/go-gormigrate/gormigrate/v2"
 	_ "github.com/lib/pq"
 
 	"gorm.io/driver/postgres"
@@ -15,19 +16,7 @@ import (
 
 var PgConn *gorm.DB
 
-func register() []interface{} {
-	return []interface{}{
-		&models.Users{},
-		&models.UsersMeta{},
-	}
-}
-func registerSeedData() []interface{} {
-	return []interface{}{
-		&models.Users{ID: "admin", Account: "admin", Password: "5a1d689fabfeefb613fbf4399f8795e9b54102bdc2ce85d13483dc3e2b97c003",
-			PasswordSalt: `()#"(#!%+%`, ErrorCount: 0, Activated: true, Role: 1},
-		&models.UsersMeta{UsersID: "admin", Name: "administrator", Email: "test@yahoo.com.tw", Avatar: nil, SendEmail: true},
-	}
-}
+type Migration = gormigrate.Migration
 
 func InitDatabase() error {
 	host := os.Getenv("POSTGRES_HOST")
@@ -52,22 +41,15 @@ func InitDatabase() error {
 		return fmt.Errorf("faild to connect to database: %v", err)
 	}
 
-	allModels := register()
-
-	err = PgConn.AutoMigrate(allModels...)
-	if err != nil {
-		return fmt.Errorf("failed to migrate database: %v", err)
+	migrationsList := []*Migration{
+		models.MigrateUsers(),
+		models.MigrateUsersMeta(),
 	}
 
-	seedDatas := registerSeedData()
-
-	for _, seedData := range seedDatas {
-		if err := PgConn.FirstOrCreate(seedData, seedData).Error; err != nil {
-			fmt.Println(err)
-			return err
-		}
+	g := gormigrate.New(PgConn, gormigrate.DefaultOptions, migrationsList)
+	if err := g.Migrate(); err != nil {
+		panic("failed to migrate: " + err.Error())
 	}
-
 	return nil
 }
 
