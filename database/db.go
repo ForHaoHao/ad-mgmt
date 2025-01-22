@@ -28,7 +28,6 @@ func InitDatabase() error {
 
 	conn := fmt.Sprintf("host=%s user=%s password=%s port=%s sslmode=%s", host, user, password, port, sslMode)
 
-	// 檢查並創建資料庫
 	err := createDatabaseIfNotExists(conn, dbName)
 
 	if err != nil {

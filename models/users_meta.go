@@ -15,13 +15,13 @@ type UsersMeta struct {
 
 func MigrateUsersMeta() *gormigrate.Migration {
 	return &gormigrate.Migration{
-		ID: "20250122_create_users_meta_table",
+		ID: "_create_users_meta_table",
 		Migrate: func(g *gorm.DB) error {
-			// 创建表结构
+
 			if err := g.AutoMigrate(&UsersMeta{}); err != nil {
 				return err
 			}
-			// 插入默认值
+
 			usersMeta := []UsersMeta{
 				{UsersID: "admin", Name: "administrator", Email: "test@yahoo.com.tw", Avatar: nil, SendEmail: true},
 			}
