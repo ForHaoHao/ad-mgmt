@@ -23,9 +23,8 @@ func init() {
 // NewRouter
 // @return *gin.Engine
 func NewRouter() *gin.Engine {
-	router := gin.Default() // Use gin default engine
+	router := gin.Default()
 	for _, route := range routes {
-		// Has middleware use this router
 		if route.Middleware != nil {
 			router.Handle(route.Method, route.Pattern, route.Middleware, route.Handler)
 		} else {

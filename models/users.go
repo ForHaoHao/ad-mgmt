@@ -1,6 +1,9 @@
 package models
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )
@@ -17,7 +20,7 @@ type Users struct {
 
 func MigrateUsers() *gormigrate.Migration {
 	return &gormigrate.Migration{
-		ID: "20250122_create_users_table",
+		ID: fmt.Sprintf("%s_create_users_table", time.Now().Format("20060102")),
 		Migrate: func(g *gorm.DB) error {
 			if err := g.AutoMigrate(&Users{}); err != nil {
 				return err

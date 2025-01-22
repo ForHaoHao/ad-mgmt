@@ -18,14 +18,12 @@ func CaesarEncrypted(codeText string, status, shift int) (string, error) {
 		}
 
 		if index != -1 {
-			// 根據 status 計算新字符
 			if status == 1 {
 				baseCode.WriteRune(hashSalt[(index+shift)%len(hashSalt)])
 			} else {
 				baseCode.WriteRune(hashSalt[(index-shift+len(hashSalt))%len(hashSalt)])
 			}
 		} else {
-			// 如果字符不在 hashSalt 中，直接添加
 			baseCode.WriteRune(text)
 		}
 	}
