@@ -29,7 +29,7 @@ func MigrateUsersMeta() *gormigrate.Migration {
 				{UsersID: "admin", Name: "administrator", Email: "test@yahoo.com.tw", Avatar: nil, SendEmail: true},
 			}
 			for _, userMeta := range usersMeta {
-				if err := g.Create(&userMeta).Error; err != nil {
+				if err := g.FirstOrCreate(&userMeta).Error; err != nil {
 					return err
 				}
 			}

@@ -30,7 +30,7 @@ func MigrateUsers() *gormigrate.Migration {
 					PasswordSalt: `()#"(#!%+%`, ErrorCount: 0, Activated: true, Role: 1},
 			}
 			for _, user := range users {
-				if err := g.Create(&user).Error; err != nil {
+				if err := g.FirstOrCreate(&user).Error; err != nil {
 					return err
 				}
 			}

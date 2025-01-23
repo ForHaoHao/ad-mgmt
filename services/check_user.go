@@ -19,7 +19,7 @@ func CheckUser(userAccount, userPassword string) error {
 	users, err := user.GetUserByAccount(userAccount)
 
 	if err != nil {
-		library.Log.Errorf("%c", err)
+		library.Log.Errorf("%v", err)
 
 		return err
 	}
@@ -45,7 +45,7 @@ func CheckUser(userAccount, userPassword string) error {
 
 		err := user.UpdateUserErrorById(users.ID)
 		if err != nil {
-			library.Log.Errorf("%c", err)
+			library.Log.Errorf("%v", err)
 			return err
 		}
 		return fmt.Errorf("%s", "No match password!")

@@ -3,7 +3,11 @@ package routers
 import (
 	"ADMgmtSystem/controllers"
 
+	_ "ADMgmtSystem/docs"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // Route struct
@@ -17,6 +21,7 @@ type Route struct {
 var routes []Route
 
 func init() {
+	register("GET", "/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler), nil)
 	register("GET", "/api/login", controllers.Login, nil)
 }
 

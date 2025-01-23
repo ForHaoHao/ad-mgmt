@@ -10,30 +10,40 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Login(context *gin.Context) {
+// Login
+//
+//	@Summary		User login function
+//	@Description	login
+//	@Tags			login
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{string}	ok
+//	@Failure		401	{string}	error
+//	@Router			/login [get]
+func Login(ginContext *gin.Context) {
 	//headerAuth := context.GetHeader("Authorization")
 	headerAuth := "ZHM3QHE6SrV4SHk0RXQ1"
 	if headerAuth == "" {
-		context.JSON(401, gin.H{
+		ginContext.JSON(401, gin.H{
 			"error": "Authorization header is required",
 		})
 		return
 	}
-	decodeString, err := library.CaesarEncrypted(headerAuth, 0, 4)
+	decodeAuth, err := library.CaesarEncrypted(headerAuth, 0, 4)
 
 	if err != nil {
 		library.Log.Error(err)
-		context.JSON(401, gin.H{
+		ginContext.JSON(401, gin.H{
 			"error": "Caesar decode error",
 		})
 		return
 	}
 
-	originCode, err := base64.StdEncoding.DecodeString(decodeString)
+	originCode, err := base64.StdEncoding.DecodeString(decodeAuth)
 
 	if err != nil {
 		library.Log.Error(err)
-		context.JSON(401, gin.H{
+		ginContext.JSON(401, gin.H{
 			"error": "base64 decode error",
 		})
 		return
@@ -43,12 +53,12 @@ func Login(context *gin.Context) {
 	err = services.CheckUser(userInfo[0], userInfo[1])
 	if err != nil {
 		library.Log.Error(err)
-		context.JSON(401, gin.H{
-			"error": fmt.Sprintf("%c", err),
+
+		ginContext.JSON(401, gin.H{
+			"error": fmt.Sprintf("%v", err),
 		})
 		return
 	}
-	context.JSON(200, gin.H{
-		"token": string(originCode),
-	})
+
+	ginContext.SetCookie("SystemID", string(originCode), 0, "/", ".haocess.com", false, true)
 }

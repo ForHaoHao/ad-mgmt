@@ -34,7 +34,7 @@ func InitDatabase() error {
 		log.Fatalf("Failed to ensure database exists: %v", err)
 	}
 
-	PgConn, err := gorm.Open(postgres.Open(fmt.Sprintf("%s dbname=%s", conn, dbName)), &gorm.Config{})
+	PgConn, err = gorm.Open(postgres.Open(fmt.Sprintf("%s dbname=%s", conn, dbName)), &gorm.Config{})
 
 	if err != nil {
 		return fmt.Errorf("faild to connect to database: %v", err)
