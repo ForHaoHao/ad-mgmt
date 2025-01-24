@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"ADMgmtSystem/database"
 	"ADMgmtSystem/library"
+	"ADMgmtSystem/models/db"
 	"ADMgmtSystem/models/vo"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // AddUser Insert user to database
@@ -27,7 +30,40 @@ func AddUser(ginContext *gin.Context) {
 		ginContext.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
-
 		return
 	}
+
+	userID, err := library.GenerateRandom(255)
+	if err != nil {
+		ginContext.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	user := &db.User{ID: userID, Account: AddUserVO.Account, Activated: AddUserVO.Activated, Role: AddUserVO.Role}
+	userMeta := &db.UsersMeta{UsersID: userID, Name: AddUserVO.Name, Email: AddUserVO.Email, Avatar: nil, SendEmail: AddUserVO.SendEmail}
+
+	err = database.PgConn.Transaction(func(db *gorm.DB) error {
+		if err := user.InsertUser(db); err != nil {
+			return err
+		}
+
+		if err := userMeta.InsertUsersMeta(db); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		ginContext.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ginContext.JSON(http.StatusOK, gin.H{
+		"data": "Ok",
+	})
 }

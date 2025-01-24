@@ -4,13 +4,22 @@ import (
 	"ADMgmtSystem/database"
 	"ADMgmtSystem/library"
 	"ADMgmtSystem/models"
+
+	"gorm.io/gorm"
 )
 
 type UsersRepository interface {
 	GetUserByAccount(userAccount string) (models.Users, error)
 	UpdateUserErrorById(userId string) error
 }
-type User struct{}
+type User struct {
+	ID           string
+	Account      string
+	Password     string
+	PasswordSalt string
+	Activated    bool
+	Role         uint
+}
 
 func (u *User) GetUserByAccount(userAccount string) (models.Users, error) {
 	var user models.Users
@@ -37,5 +46,25 @@ func (u *User) UpdateUserErrorById(userId string) error {
 		library.Log.Error(result.Error)
 		return result.Error
 	}
+	return nil
+}
+
+func (u *User) InsertUser(db *gorm.DB) error {
+	var err error
+
+	if u.Password, err = library.GenerateRandom(10); err != nil {
+		return err
+	}
+
+	if u.PasswordSalt, err = library.GenerateRandomSymbols(10); err != nil {
+		return err
+	}
+
+	user := &models.Users{ID: u.ID, Account: u.Account, Password: u.Password, PasswordSalt: u.PasswordSalt, ErrorCount: 0, Activated: u.Activated, Role: u.Role}
+
+	if err := db.Create(user).Error; err != nil {
+		return err
+	}
+
 	return nil
 }
